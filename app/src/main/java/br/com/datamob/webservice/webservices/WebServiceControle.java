@@ -124,14 +124,13 @@ public class WebServiceControle
         }
         else
         {
-            JsonObjectRequest jsonObjectRequest
-                    = new JsonObjectRequest(Request.Method.POST,
+            StringRequest stringRequest
+                    = new StringRequest(Request.Method.POST,
                     "https://cloud.squidex.io/api/content/barao/universidades?publish=true",
-                    new JSONObject(new Gson().toJson(data)),
-                    new Response.Listener<JSONObject>()
+                    new Response.Listener<String>()
                     {
                         @Override
-                        public void onResponse(JSONObject response)
+                        public void onResponse(String response)
                         {
                             if (criaUniversidadeListener != null)
                                 criaUniversidadeListener.onResultOk();
@@ -154,8 +153,21 @@ public class WebServiceControle
                     headers.put("Authorization", token.getToken_type() + " " + token.getAccess_token());
                     return headers;
                 }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError
+                {
+                    String json = new Gson().toJson(data);
+                    return json.getBytes();
+                }
+
+                @Override
+                public String getBodyContentType()
+                {
+                    return "application/json";
+                }
             };
-            getRequestQueueInstance(context).add(jsonObjectRequest);
+            getRequestQueueInstance(context).add(stringRequest);
         }
     }
 
